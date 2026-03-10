@@ -1,0 +1,5 @@
+{
+  "build": {
+    "builder": "NIXPACKS"  // Railway 会自动检测语言，通常无需修改
+  }
+}
