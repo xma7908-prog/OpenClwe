@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>烬野智能店长</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f5f5f5;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;color:#222}.app{max-width:720px;margin:auto;height:100vh;background:#fff;display:flex;flex-direction:column}.header{padding:18px 16px 14px;background:#171717;color:#fff}.header h1{margin:0;font-size:20px}.header p{margin:6px 0 0;color:#aaa;font-size:13px}.messages{flex:1;overflow:auto;padding:18px 14px}.welcome{background:#f7f7f7;border-radius:14px;padding:15px;margin-bottom:14px;line-height:1.7}.msg{display:flex;margin:12px 0}.msg.user{justify-content:flex-end}.bubble{max-width:82%;padding:11px 14px;border-radius:14px;white-space:pre-wrap;line-height:1.6;font-size:15px}.assistant .bubble{background:#f1f1f1}.user .bubble{background:#171717;color:#fff}.inputbar{display:flex;gap:8px;padding:10px 12px calc(10px + env(safe-area-inset-bottom));border-top:1px solid #eee}.inputbar textarea{flex:1;border:1px solid #ddd;border-radius:12px;padding:10px;font:inherit;resize:none;height:44px;outline:none}.inputbar button{width:70px;border:0;border-radius:12px;background:#171717;color:#fff;font-size:15px}.inputbar button:disabled{opacity:.5}.quick{display:flex;gap:8px;overflow:auto;padding:0 14px 10px}.quick button{white-space:nowrap;border:1px solid #ddd;background:#fff;border-radius:20px;padding:7px 12px}.loading{opacity:.6}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="header"><h1>🤖 烬野智能店长</h1><p>清真烬野·原味炭烤 · 经营助手</p></header>
+<main class="messages" id="messages"><div class="welcome">老板，我是你的智能店长。<br>你可以直接问我：<br>• 今天生意怎么样？<br>• 最近客单价有什么问题？<br>• 帮我分析最近经营情况<br>• 明天抖音发什么？</div></main>
+<div class="quick"><button onclick="ask('今天生意怎么样？')">今天生意怎么样</button><button onclick="ask('最近经营有什么问题？')">找经营问题</button><button onclick="ask('帮我想一个明天的抖音视频')">明天发什么</button></div>
+<div class="inputbar"><textarea id="input" placeholder="问问你的智能店长…"></textarea><button id="send" onclick="sendMessage()">发送</button></div>
+</div>
+<script>
+const messages=document.getElementById('messages'),input=document.getElementById('input'),send=document.getElementById('send');
+function add(role,text){const row=document.createElement('div');row.className='msg '+role;const b=document.createElement('div');b.className='bubble';b.textContent=text;row.appendChild(b);messages.appendChild(row);messages.scrollTop=messages.scrollHeight;return b}
+function ask(t){input.value=t;sendMessage()}
+async function sendMessage(){const text=input.value.trim();if(!text||send.disabled)return;input.value='';add('user',text);send.disabled=true;const b=add('assistant','店长正在思考…');b.classList.add('loading');try{const r=await fetch('/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:text})});const data=await r.json();b.classList.remove('loading');b.textContent=data.reply||data.error||'暂时没有收到回复。'}catch(e){b.classList.remove('loading');b.textContent='连接失败，请稍后再试。'}finally{send.disabled=false;input.focus()}}
+input.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage()}});
+</script>
+</body>
+</html>
